@@ -22,13 +22,7 @@ def parse_input(input_str: str):
     return rows, cols, obstructions, start
 
 
-def simulate(
-    start: tuple,
-    direction: int,
-    obstructions: set,
-    rows: int,
-    cols: int,
-):
+def simulate(start: tuple, direction: int, obstructions: set, rows: int, cols: int):
     def step(state: tuple):
         (x, y), direction = state
 
@@ -40,7 +34,7 @@ def simulate(
             if (nx, ny) not in obstructions:
                 return (nx, ny), direction
 
-            # Turn 90 degrees right
+            # Try turning clockwise
             direction = (direction + 1) % 4
 
         raise ValueError("No valid moves")
@@ -65,35 +59,28 @@ def simulate(
     return states
 
 
-def part1(
-    start: tuple,
-    direction: int,
-    obstructions: set,
-    rows: int,
-    cols: int,
+def guard_positions(
+    start: tuple, direction: int, obstructions: set, rows: int, cols: int
 ):
     states = simulate(start, direction, obstructions, rows, cols)
 
     assert states is not None
 
-    return len(set(position for position, _ in states))
+    return set(position for position, _ in states)
 
 
-def part2(
-    start: tuple,
-    direction: int,
-    obstructions: set,
-    rows: int,
-    cols: int,
-):
+def part1(start: tuple, direction: int, obstructions: set, rows: int, cols: int):
+    return len(guard_positions(start, direction, obstructions, rows, cols))
+
+
+def part2(start: tuple, direction: int, obstructions: set, rows: int, cols: int):
+    # It only makes sense to add obstructions to the path of the guard
+    positions = guard_positions(start, direction, obstructions, rows, cols)
     return sum(
         1
-        for row in range(rows)
-        for col in range(cols)
-        # Skip existing obstructions
-        if (row, col) not in obstructions
+        for position in positions
         # Check if we have a cycle with the new obstruction
-        and simulate(start, direction, obstructions | {(row, col)}, rows, cols) is None
+        if simulate(start, direction, obstructions | {position}, rows, cols) is None
     )
 
 
