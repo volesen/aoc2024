@@ -1,4 +1,5 @@
 from math import log10
+from operator import add, mul
 
 
 def parse_input(input: str):
@@ -57,7 +58,7 @@ if __name__ == "__main__":
         input = parse_input(f.read())
 
     # Part 1
-    print(total_calibration_result(input, [int.__add__, int.__mul__]))
+    print(total_calibration_result(input, [add, mul]))
 
     # Part 2
-    print(total_calibration_result(input, [int.__add__, int.__mul__, concat]))
+    print(total_calibration_result(input, [add, mul, concat]))
