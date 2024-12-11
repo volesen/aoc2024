@@ -18,24 +18,23 @@ def split_digits(n):
 
 def step(stone):
     if stone == 0:
-        return (1,)
-
-    digits = num_digits(stone)
-    if digits % 2 == 0:
+        yield 1
+    elif (digits := num_digits(stone)) % 2 == 0:
         half = digits // 2
-        return stone // 10**half, stone % 10**half
-
-    return (stone * 2024,)
+        yield stone // 10**half
+        yield stone % 10**half
+    else:
+        yield stone * 2024
 
 
 @cache
-def num_stones(stone: int, blinks: int, target_blinks: int):
-    if blinks == target_blinks:
+def num_stones(stone: int, blinks: int):
+    if blinks == 0:
         return 1
 
     stones = step(stone)
 
-    return sum(num_stones(stone, blinks + 1, target_blinks) for stone in stones)
+    return sum(num_stones(stone, blinks - 1) for stone in stones)
 
 
 if __name__ == "__main__":
@@ -43,7 +42,7 @@ if __name__ == "__main__":
         stones = parse(f.read())
 
     # Part 1
-    print(sum(num_stones(stone, 0, target_blinks=25) for stone in stones))
+    print(sum(num_stones(stone, blinks=25) for stone in stones))
 
     # Part 2
-    print(sum(num_stones(stone, 0, target_blinks=75) for stone in stones))
+    print(sum(num_stones(stone, blinks=75) for stone in stones))
