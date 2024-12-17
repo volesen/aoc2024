@@ -4,7 +4,12 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "matplotlib>=3.10.0",
+    "numpy>=2.2.0",
+    "pulp>=2.9.0",
+    "z3-solver>=4.13.4.0",
+]
 
 [dependency-groups]
 dev = [
