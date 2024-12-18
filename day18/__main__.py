@@ -1,7 +1,8 @@
 from collections import deque
 
-ROWS = 70 + 1
-COLS = 70 + 1
+DIRS = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+ROWS = 71
+COLS = 71
 
 
 def parse_positions(positions):
@@ -11,51 +12,36 @@ def parse_positions(positions):
 
 
 def neighbours(x, y):
-    return [(x, y - 1), (x, y + 1), (x - 1, y), (x + 1, y)]
-
-
-def within_bounds(x, y):
-    return 0 <= x < ROWS and 0 <= y < COLS
+    return [
+        (x + dx, y + dy) for dx, dy in DIRS if 0 <= x + dx < ROWS and 0 <= y + dy < COLS
+    ]
 
 
 def shortest_distance(start, end, obstacles):
     queue = deque([(0, start)])
-    visited = set()
+    visited = {start}
 
     while queue:
-        distance, (x, y) = queue.popleft()
+        distance, current = queue.popleft()
 
-        if (x, y) == end:
+        if current == end:
             return distance
 
-        if (x, y) in visited:
-            continue
-
-        visited.add((x, y))
-
-        for neighbour in neighbours(x, y):
-            nx, ny = neighbour
-
-            if neighbour in obstacles:
-                continue
-
-            if not within_bounds(nx, ny):
-                continue
-
-            queue.append((distance + 1, neighbour))
+        for neighbour in neighbours(*current):
+            if neighbour not in visited and neighbour not in obstacles:
+                visited.add(neighbour)
+                queue.append((distance + 1, neighbour))
 
     return None
 
 
 def first_blocking_obstacle(start, end, positions):
-    # Plan-of-attack: Binary search for the first obstacle that blocks the path
-    low = 0
-    high = len(positions)
+    # Binary search for the first obstacle that prevents reaching the end.
+    low, high = 0, len(positions)
 
     while low < high:
         mid = (low + high) // 2
         obstacles = set(positions[: mid + 1])
-
         if shortest_distance(start, end, obstacles) is None:
             high = mid
         else:
